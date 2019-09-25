@@ -1,0 +1,11 @@
+server:
+  port: 10086
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+logging:
+  level:
+    com.example.demo.mapper: debug

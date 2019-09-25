@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.ReportFormMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.demo.domain.ReportForm">
+        <result column="ChargeId" property="chargeId" jdbcType="INTEGER"/>
+        <result column="Department" property="department" jdbcType="NVARCHAR"/>
+        <result column="AccountNumber" property="accountNumber" jdbcType="NVARCHAR"/>
+        <result column="AccountName" property="accountName" jdbcType="NVARCHAR"/>
+        <result column="CopyThreeBw" property="copyThreeBw" jdbcType="INTEGER"/>
+        <result column="CopyThreeColor" property="copyThreeColor" jdbcType="INTEGER"/>
+        <result column="PrintThreeBw" property="printThreeBw" jdbcType="INTEGER"/>
+        <result column="PrintThreeColor" property="printThreeColor" jdbcType="INTEGER"/>
+        <result column="LowCopyThreeBw" property="lowCopyThreeBw" jdbcType="INTEGER"/>
+        <result column="LowCopyThreeColor" property="lowCopyThreeColor" jdbcType="INTEGER"/>
+        <result column="LowPrintThreeBw" property="lowPrintThreeBw" jdbcType="INTEGER"/>
+        <result column="LowPrintThreeColor" property="lowPrintThreeColor" jdbcType="INTEGER"/>
+        <result column="TotalCopyBw" property="totalCopyBw" jdbcType="INTEGER"/>
+        <result column="TotalCopyColor" property="totalCopyColor" jdbcType="INTEGER"/>
+        <result column="TotalPrintBw" property="totalPrintBw" jdbcType="INTEGER"/>
+        <result column="TotalPrintColor" property="totalPrintColor" jdbcType="INTEGER"/>
+        <result column="CopyTotal" property="copyTotal" jdbcType="NVARCHAR"/>
+        <result column="PrintTotal" property="printTotal" jdbcType="NVARCHAR"/>
+    </resultMap>
+
+    <select id="queryReportForm" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select DISTINCT tr.chargeid as ChargeId,
+        (select val.name from cat_validation val where val.id = (select ass.mainid from cas_val_assoc ass where
+        ass.associd = tr.chargeid)) as Department,
+        va.name as AccountNumber,
+        va.description as AccountName
+        from cat_transaction tr
+        LEFT JOIN cat_validation va on tr.chargeid = va.id
+        <where>
+            tr.trxsubtype in ('cpy','prn')
+            <trim suffixOverrides="AND">
+                <if test=" beginTime != null and beginTime != '' ">
+                    AND tr.creation &gt;= #{beginTime,jdbcType=VARCHAR}
+                </if>
+                <if test=" endTime != null and endTime != '' ">
+                    AND tr.creation &lt;= #{endTime,jdbcType=VARCHAR}
+                </if>
+            </trim>
+        </where>
+        ORDER BY tr.chargeid,va.name;
+    </select>
+
+    <select id="queryCopyTotal" resultMap="BaseResultMap">
+        select trxxml as CopyTotal from cat_trxxml where id in (select id from cat_transaction
+        where
+        chargeid = #{chargeId,jdbcType=INTEGER} and trxsubtype = 'cpy')
+    </select>
+
+    <select id="queryPrintTotal" resultMap="BaseResultMap">
+        select docdetails as PrintTotal from cas_sdr_history where accountid = #{chargeId,jdbcType=INTEGER} and disptype = 'rls'
+    </select>
+
+</mapper>

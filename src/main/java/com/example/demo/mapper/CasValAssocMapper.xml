@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.CasValAssocMapper">
+
+
+    <resultMap id="assocMap" type="com.example.demo.domain.CasValAssoc">
+        <result column="mainid" property="mainId"/>
+        <result column="associd" property="assocId"/>
+    </resultMap>
+
+    <select id="querLinkByUserId" resultMap="assocMap" parameterType="java.lang.Integer">
+        select mainid,associd from cas_val_assoc where associd = #{userId}
+    </select>
+
+    <insert id="saveAssocLink" parameterType="com.example.demo.domain.CasValAssoc">
+        insert into cas_val_assoc(mainid,associd)values (
+        #{entity.mainId},
+        #{entity.assocId}
+        )
+    </insert>
+
+    <update id="updAssocLink" parameterType="com.example.demo.domain.CasValAssoc">
+        update cas_val_assoc set mainid = #{entity.mainId} where associd = #{entity.assocId}
+    </update>
+
+    <delete id="delAssocLink" parameterType="java.lang.Integer">
+        delete cas_val_assoc where associd = #{userId}
+    </delete>
+</mapper>

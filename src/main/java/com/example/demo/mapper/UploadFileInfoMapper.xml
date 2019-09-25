@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.UploadFileInfoMapper">
+
+    <update id="test">
+        update upload_file_info set is_com = '1' where id = '0194deab-174f-4d34-8bc2-42c559304603'
+    </update>
+
+</mapper>

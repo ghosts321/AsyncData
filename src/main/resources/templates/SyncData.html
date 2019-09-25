@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADsync</title>
+</head>
+<body>
+    <form>
+        待同步数据库url:<input type="text"  id="mainUrl"><br>
+        待同步数据库名称:<input type="text"  id="mainDataBaseName"><br>
+        待同步数据库用户名:<input type="text" id="mainUserName"><br>
+        待同步数据库密码:<input type="password" id="mainPassWord"><br>
+        AD域url:<input type="text" id="syncUrl"><br>
+<!--        AD域端口号:<input type="text" id="syncDataBaseName"><br>-->
+        AD域用户名:<input type="text" id="syncUserName"><br>
+        AD域密码:<input type="password" id="syncPassWord"><br>
+        <input type="button" value="测试连接" onclick="testConnection()">
+        <input type="button" value="同步数据" onclick="syncData()">
+        <input type="button" value="查看报表" onclick="selectList()">
+    </form>
+<script type="text/javascript" src = "/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" >
+
+    syncData = function () {
+        let mainUrl = $('#mainUrl').val();
+        let mainDataBaseName = $('#mainDataBaseName').val();
+        let mainUserName = $('#mainUserName').val();
+        let mainPassWord = $('#mainPassWord').val();
+        let syncUrl = $('#syncUrl').val();
+        let syncDataBaseName = $('#syncDataBaseName').val();
+        let syncUserName = $('#syncUserName').val();
+        let syncPassWord = $('#syncPassWord').val();
+        if (mainUrl === '' || syncUrl === '') {
+            alert('数据库url不能为空');
+            return;
+        }
+        if (mainDataBaseName === '' ||syncDataBaseName==='' ) {
+            alert('数据库名称不能为空');
+            return;
+        }
+        if (mainUserName === '' || syncUserName === '') {
+            alert('数据库用户名不能为空');
+            return;
+        }
+        if (mainPassWord === '' || syncPassWord === '') {
+            alert('数据库用户密码不能为空');
+            return;
+        }
+        let domain = {
+            mainUrl: mainUrl,
+            mainDataBaseName:mainDataBaseName,
+            mainUserName:mainUserName,
+            mainPassWord:mainPassWord,
+            syncUrl:syncUrl,
+            syncDataBaseName:syncDataBaseName,
+            syncUserName:syncUserName,
+            syncPassWord:syncPassWord
+        };
+        $.ajax({
+            url:'http://localhost:10086/sync/data',
+            async:false,
+            type:'post',
+            data:domain,
+            success:function (data) {
+                alert(data);
+            }
+        })
+    };
+
+    testConnection = function () {
+        let mainUrl = $('#mainUrl').val();
+        let mainDataBaseName = $('#mainDataBaseName').val();
+        let mainUserName = $('#mainUserName').val();
+        let mainPassWord = $('#mainPassWord').val();
+        let syncUrl = $('#syncUrl').val();
+        let syncDataBaseName = $('#syncDataBaseName').val();
+        let syncUserName = $('#syncUserName').val();
+        let syncPassWord = $('#syncPassWord').val();
+        if (mainUrl === '' || syncUrl === '') {
+            alert('数据库url不能为空');
+            return;
+        }
+        if (mainDataBaseName === '' ||syncDataBaseName==='' ) {
+            alert('数据库名称不能为空');
+            return;
+        }
+        if (mainUserName === '' || syncUserName === '') {
+            alert('数据库用户名不能为空');
+            return;
+        }
+        if (mainPassWord === '' || syncPassWord === '') {
+            alert('数据库用户密码不能为空');
+            return;
+        }
+        let domain = {
+            mainUrl: mainUrl,
+            mainDataBaseName:mainDataBaseName,
+            mainUserName:mainUserName,
+            mainPassWord:mainPassWord,
+            syncUrl:syncUrl,
+            syncDataBaseName:syncDataBaseName,
+            syncUserName:syncUserName,
+            syncPassWord:syncPassWord
+        };
+        alert("正在进行连接测试，请稍等。。。。");
+        $.ajax({
+            url:'http://localhost:10086/sync/testConnection',
+            async:true,
+            type:'post',
+            data:domain,
+            success:function (data) {
+                alert(data);
+            }
+        })
+    };
+
+    selectList = function () {
+        location.href = "./SelectList.html";
+    }
+</script>
+</body>
+</html>

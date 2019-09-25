@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.CatValidationMapper">
+
+    <resultMap id="validationMap" type="com.example.demo.domain.CatValidation">
+        <result column="id" property="id"/>
+        <result column="valType" property="valType"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.example.demo.domain.CatValidation" >
+        insert into cat_validation(
+        id,
+        valType,
+        name,
+        description,
+        pid,
+        balance,
+        hardlimit,
+        creation,
+        lastmodified,
+        expiration,
+        state,
+        primarypin,
+        secondarypin,
+        parid,
+        locationid,
+        nonbillable,
+        freemoney
+        )values (
+            #{entity.id},
+            #{entity.valType},
+            #{entity.name},
+            #{entity.description},
+            #{entity.pid},
+            #{entity.balance},
+            #{entity.hardLimit},
+            #{entity.craetion},
+            #{entity.lastModified},
+            #{entity.expiration},
+            #{entity.state},
+            #{entity.primaryPin},
+            #{entity.secondaryPin},
+            #{entity.parId},
+            #{entity.locationId},
+            #{entity.nonbillable},
+            #{entity.freeMoney}
+        )
+    </insert>
+    
+    <select id="queryByName" resultMap="validationMap">
+        select id from cat_validation where name = #{name}
+    </select>
+
+    <select id="queryId" resultMap="validationMap">
+        select max(id) as id from cat_validation
+    </select>
+
+    <update id="updValidation" parameterType="com.example.demo.domain.CatValidation">
+        update cat_validation set
+        name = #{entity.name},
+        description = #{entity.description} where id = #{entity.id}
+    </update>
+
+
+</mapper>

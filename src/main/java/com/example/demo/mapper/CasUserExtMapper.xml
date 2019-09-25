@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.CasUserExtMapper">
+
+    <resultMap id="userMap" type="com.example.demo.domain.CasUserExt">
+        <result column="x_id" property="x_id"/>
+        <result column="fullname" property="fullName"/>
+        <result column="email" property="email"/>
+    </resultMap>
+
+    <select id="queryByUserName" resultMap="userMap">
+        select x_id from  cas_user_ext where fullname = #{userName};
+    </select>
+
+    <insert id="saveUser" parameterType="com.example.demo.domain.CasUserExt">
+        insert into cas_user_ext(
+        x_id,
+        fullname,
+        email,
+        classid,
+        homedre,
+        colorquota,
+        colorpagecount,
+        forceprimarypinupdate,
+        forcesecondarypinupdate,
+        homefolder,
+        potentialdre,
+        additionalinfo,
+        syncidentifier,
+        defaultbillingcode
+        )
+        values (
+        #{entity.x_id},
+        #{entity.fullName},
+        #{entity.email},
+        #{entity.classId},
+        #{entity.homeDre},
+        #{entity.colorQuota},
+        #{entity.colorPageCount},
+        #{entity.forcePrimaryPinUpdate},
+        #{entity.forceSecondaryPinUpdate},
+        #{entity.homeFolder},
+        #{entity.potenTialDre},
+        #{entity.addiTionlInfo},
+        #{entity.syncIdentiFier},
+        #{entity.defaultBillingCode}
+        )
+    </insert>
+
+    <update id="updUser" parameterType="com.example.demo.domain.CasUserExt">
+        update cas_user_ext set
+        email = #{entity.email} where x_id = #{entity.x_id}
+    </update>
+
+</mapper>
