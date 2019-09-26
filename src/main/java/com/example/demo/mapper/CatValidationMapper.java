@@ -3,6 +3,8 @@ package com.example.demo.mapper;
 import com.example.demo.domain.CatValidation;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @Interface CatValidationMapper
  * @Description TODO
@@ -14,9 +16,11 @@ public interface CatValidationMapper {
 
 	Integer save(@Param("entity") CatValidation entity);
 
-	CatValidation queryByName(@Param("name") String name);
+	List<CatValidation> queryByName(@Param("name") String name, @Param("valType") String valType);
 
 	void updValidation(@Param("entity") CatValidation entity);
+
+	void updPidById(@Param("pid") int pid, @Param("id") int id);
 
     CatValidation queryId();
 }

@@ -36,7 +36,7 @@ public class CatValidation {
 
 	private int primaryPin;
 
-	private int secondaryPin;
+	private String secondaryPin;
 
 	private int parId;
 
@@ -142,11 +142,11 @@ public class CatValidation {
         this.primaryPin = primaryPin;
     }
 
-    public int getSecondaryPin() {
+    public String getSecondaryPin() {
         return secondaryPin;
     }
 
-    public void setSecondaryPin(int secondaryPin) {
+    public void setSecondaryPin(String secondaryPin) {
         this.secondaryPin = secondaryPin;
     }
 

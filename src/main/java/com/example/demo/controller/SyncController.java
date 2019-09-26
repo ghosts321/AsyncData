@@ -192,8 +192,6 @@ public class SyncController {
                         .body(new ResponseMap(Constant.PARAMETE_ERROR, "AD域登录密码不能为空！", "").getResponseMap());
             }
 
-            Thread.sleep(5000000);
-
             DataBaseDomain dataBaseDomain = JSONObject.parseObject(formData, DataBaseDomain.class);
             DataBaseConnection connection = connection(dataBaseDomain);
             DataSource mainDataSource = connection.getMainDataSource();
@@ -213,6 +211,7 @@ public class SyncController {
                 int userId = saveUserData(casUserExt, userExtMapper, validationMapper);
                 int depId = saveDepData(casUserExt, validationMapper);
                 saveAssoc(userId, depId, assocMapper);
+                validationMapper.updPidById(depId, userId);
             }
             this.outPutProperties(dataBaseDomain);
             return ResponseEntity.status(HttpStatus.OK)
@@ -544,6 +543,14 @@ public class SyncController {
 
                         ReportForm reportForm1 = new ReportForm();
 
+                        if(printTotal.contains(":")){
+
+                            String a = printTotal.substring(printTotal.indexOf(":") + 1, printTotal.length());
+
+                            printTotal = a.trim();
+
+                        }
+
                         //是否含有多组数据
                         if (printTotal.contains(";")) {
                             List<ReportForm> reportFormList1 = new ArrayList<>();
@@ -631,16 +638,19 @@ public class SyncController {
 
     public int saveUserData(CasUserExt casUserExt, CasUserExtMapper userExtMapper, CatValidationMapper validationMapper) throws Exception {
         String userName = casUserExt.getSamAccountName();
-        CatValidation catValidation = validationMapper.queryByName(userName);
-        if (catValidation != null) {
+        CatValidation catValidation = new CatValidation();
+        List<CatValidation> catValidationList = validationMapper.queryByName(userName, "usr");
+        if (catValidationList != null && catValidationList.size() > 0) {
+            catValidation = catValidationList.get(0);
             catValidation.setName(casUserExt.getSamAccountName());
             catValidation.setDescription(casUserExt.getFullName());
+            catValidation.setState(1);
+            catValidation.setSecondaryPin("3CE59CD2B1F5525CFB84E3B1C10F8942");
             validationMapper.updValidation(catValidation);
             casUserExt.setX_id(catValidation.getId());
             userExtMapper.updUser(casUserExt);
             return catValidation.getId();
         }
-        catValidation = new CatValidation();
         CatValidation maxId = validationMapper.queryId();
         catValidation.setName(casUserExt.getSamAccountName());
         catValidation.setValType("usr");
@@ -649,6 +659,9 @@ public class SyncController {
         validationMapper.save(catValidation);
         int id = catValidation.getId();
         casUserExt.setX_id(id);
+        casUserExt.setClassId(304);
+        casUserExt.setColorQuota(-1);
+        casUserExt.setColorPageCount(0);
         casUserExt.setPotenTialDre("");
         casUserExt.setAddiTionlInfo("");
         userExtMapper.saveUser(casUserExt);
@@ -660,11 +673,12 @@ public class SyncController {
         if (department == null || "".equals(department)) {
             return 0;
         }
-        CatValidation catValidation = validationMapper.queryByName(department);
-        if (catValidation != null) {
+        CatValidation catValidation = new CatValidation();
+        List<CatValidation> catValidationList = validationMapper.queryByName(department, "dpt");
+        if (catValidationList != null && catValidationList.size() > 0) {
+            catValidation = catValidationList.get(0);
             return catValidation.getId();
         }
-        catValidation = new CatValidation();
         CatValidation maxId = validationMapper.queryId();
         catValidation.setName(department);
         catValidation.setValType("dpt");
@@ -706,7 +720,7 @@ public class SyncController {
         }
         String baseDc = stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
         String filter = "(&(objectcategory=person)(objectclass=user)(!(department=离职员工)))";
-        String[] returnAttr = new String[]{"cn", "mail", "department", "mobile", "sAMAccountName"};
+        String[] returnAttr = new String[]{"cn", "ou", "mail", "department", "mobile", "sAMAccountName"};
         searchControls.setReturningAttributes(returnAttr);
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         NamingEnumeration<SearchResult> search = ldapContext.search(baseDc, filter, searchControls);
@@ -717,7 +731,7 @@ public class SyncController {
         List<CasUserExt> list = new ArrayList<>();
         while (namingEnumeration.hasMoreElements()) {
             SearchResult next = namingEnumeration.next();
-            System.out.println(next.getName());
+            System.out.println(next);
             CasUserExt casUserExt = new CasUserExt();
             Attributes attributes = next.getAttributes();
             if (attributes.get("cn") != null) {
@@ -728,10 +742,28 @@ public class SyncController {
                 String mail = attributes.get("mail").toString();
                 casUserExt.setEmail(mail.substring(mail.lastIndexOf(":") + 1).trim());
             }
-            if (attributes.get("department") != null) {
-                String department = attributes.get("department").toString();
-                casUserExt.setDepartment(department.substring(department.lastIndexOf(":") + 1).trim());
+//            if (attributes.get("department") != null) {
+//                String department = attributes.get("department").toString();
+//                casUserExt.setDepartment(department.substring(department.lastIndexOf(":") + 1).trim());
+//            }
+            if(next != null){
+                String department = null;
+                String str = null;
+                String ou = next.toString();
+                if(ou.contains(",") && ou.contains(":")){
+                    str = ou.substring(ou.indexOf(",") + 1, ou.indexOf(":"));
+                    if(str != null && !str.equals("") && str.contains("OU")){
+                        if (str.contains(",")){
+                            department = str.substring(str.indexOf("=") + 1, str.indexOf(",")).trim();
+                        }else {
+                            department = str.substring(str.indexOf("=") + 1, str.length()).trim();
+                        }
+                    }
+                }
+                casUserExt.setDepartment(department);
             }
+
+
             if (attributes.get("mobile") != null) {
                 String mobile = attributes.get("mobile").toString();
                 casUserExt.setMobile(mobile.substring(mobile.lastIndexOf(":") + 1).trim());

@@ -50,7 +50,7 @@
     </insert>
     
     <select id="queryByName" resultMap="validationMap">
-        select id from cat_validation where name = #{name}
+        select id from cat_validation where name = #{name} and valtype = #{valType}
     </select>
 
     <select id="queryId" resultMap="validationMap">
@@ -61,6 +61,12 @@
         update cat_validation set
         name = #{entity.name},
         description = #{entity.description} where id = #{entity.id}
+    </update>
+
+    <update id="updPidById">
+        update cat_validation set
+        pid = #{pid}
+        where id = #{id}
     </update>
 
 
